@@ -21,10 +21,12 @@ public class RepetitiveEvent extends Event {
      * <LI>ChronoUnit.MONTHS for monthly repetitions</LI>
      * </UL>
      */
+
+    private ChronoUnit frequency;
+    protected  Set <LocalDate> dateExceptions = new HashSet<LocalDate>();
     public RepetitiveEvent(String title, LocalDateTime start, Duration duration, ChronoUnit frequency) {
         super(title, start, duration);
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.frequency = frequency;
     }
 
     /**
@@ -33,8 +35,8 @@ public class RepetitiveEvent extends Event {
      * @param date the event will not occur at this date
      */
     public void addException(LocalDate date) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+
+        dateExceptions.add(date);
     }
 
     /**
@@ -42,8 +44,39 @@ public class RepetitiveEvent extends Event {
      * @return the type of repetition
      */
     public ChronoUnit getFrequency() {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");    
+        return frequency;
     }
 
+    /**
+     * Tests if an event occurs on a given day
+     *
+     * @param aDay the day to test
+     * @return true if the event occurs on that day, false otherwise
+     */
+    @Override
+    public boolean isInDay(LocalDate aDay) {
+        boolean isInDay = false;
+        LocalDate dateDoccurence=super.getStart().toLocalDate();
+
+        do {
+            if (dateExceptions.contains(aDay)) {isInDay=false;
+                break;}
+
+
+            LocalDate debut=dateDoccurence;
+            LocalDate fin = debut.plusDays(super.getDuration().toDays());
+            isInDay = ((aDay.isEqual(debut))||(aDay.isEqual(fin))) || (aDay.isAfter(debut) && aDay.isBefore(fin));
+            dateDoccurence= dateDoccurence.plusDays(getFrequency().getDuration().toDays());
+
+
+
+
+        }
+        while(ChronoUnit.DAYS.between (dateDoccurence,aDay)>=0);
+
+        return isInDay;
+    }
+    public Set<LocalDate> getDateExceptions(){
+        return dateExceptions;
+    }
 }

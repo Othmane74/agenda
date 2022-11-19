@@ -3,6 +3,7 @@ package agenda;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -11,7 +12,8 @@ import java.time.temporal.ChronoUnit;
  */
 public class FixedTerminationEvent extends RepetitiveEvent {
 
-    
+    private LocalDate terminationInclusive = null;
+    private long numberOfOccurrences = 0 ;
     /**
      * Constructs a fixed terminationInclusive event ending at a given date
      *
@@ -27,9 +29,9 @@ public class FixedTerminationEvent extends RepetitiveEvent {
      * @param terminationInclusive the date when this event ends
      */
     public FixedTerminationEvent(String title, LocalDateTime start, Duration duration, ChronoUnit frequency, LocalDate terminationInclusive) {
-         super(title, start, duration, frequency);
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        super(title, start, duration, frequency);
+
+        this.terminationInclusive = terminationInclusive;
 
     }
 
@@ -49,8 +51,7 @@ public class FixedTerminationEvent extends RepetitiveEvent {
      */
     public FixedTerminationEvent(String title, LocalDateTime start, Duration duration, ChronoUnit frequency, long numberOfOccurrences) {
         super(title, start, duration, frequency);
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.numberOfOccurrences = numberOfOccurrences;
     }
 
     /**
@@ -58,13 +59,51 @@ public class FixedTerminationEvent extends RepetitiveEvent {
      * @return the termination date of this repetitive event
      */
     public LocalDate getTerminationDate() {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");   
+        if(terminationInclusive!=null) {
+            return terminationInclusive;
+        }
+        else {
+            LocalDate dateFin=getStart().toLocalDate().plus(numberOfOccurrences-1,getFrequency());
+            return dateFin;
+        }
+
     }
 
     public long getNumberOfOccurrences() {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        if(numberOfOccurrences==0&&terminationInclusive!=null){
+            long joursDiff= ChronoUnit.DAYS.between(getStart().toLocalDate(),getTerminationDate());
+            numberOfOccurrences=1+(joursDiff/getFrequency().getDuration().toDays());
+        }
+
+        return numberOfOccurrences;
     }
-        
+
+    /**
+     * Tests if an event occurs on a given day
+     *
+     * @param aDay the day to test
+     * @return true if the event occurs on that day, false otherwise
+     */
+    @Override
+    public boolean isInDay(LocalDate aDay) {
+        boolean isInDay=false;
+        LocalDateTime dateDoccurence=getStart();
+
+        if(aDay.isEqual(dateDoccurence.toLocalDate())){
+            isInDay=true;
+        }else{
+            if(!getDateExceptions().contains(aDay)){
+                for(int i=0;i<getNumberOfOccurrences();i++){
+                    dateDoccurence=dateDoccurence.plus(1,getFrequency());
+                    if(aDay.isEqual(dateDoccurence.toLocalDate())){
+                        isInDay=true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return isInDay;
+    }
 }
+

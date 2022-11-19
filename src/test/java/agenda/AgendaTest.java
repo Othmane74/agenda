@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class AgendaTest {
     Agenda agenda;
-    
+
     // November 1st, 2020
     LocalDate nov_1_2020 = LocalDate.of(2020, 11, 1);
 
@@ -33,7 +33,7 @@ public class AgendaTest {
 
     // A Weekly Repetitive event ending after a give number of occurrrences
     RepetitiveEvent fixedRepetitions = new FixedTerminationEvent("Fixed termination weekly", nov_1__2020_22_30, min_120, ChronoUnit.WEEKS, 10);
-    
+
     // A daily repetitive event, never ending
     // November 1st, 2020, 22:30, 120 minutes
     RepetitiveEvent neverEnding = new RepetitiveEvent("Never Ending", nov_1__2020_22_30, min_120, ChronoUnit.DAYS);
@@ -46,12 +46,21 @@ public class AgendaTest {
         agenda.addEvent(fixedRepetitions);
         agenda.addEvent(neverEnding);
     }
-    
+
     @Test
     public void testMultipleEventsInDay() {
         assertEquals(4, agenda.eventsInDay(nov_1_2020).size(), "Il y a 4 événements ce jour là");
         assertTrue(agenda.eventsInDay(nov_1_2020).contains(neverEnding));
     }
-
-
+    @Test
+    public void testFindEventByTitle(){
+        assertEquals(1,agenda.findByTitle("Simple event").size());
+    }
+    @Test
+    public void testIfFree(){
+        assertFalse(agenda.isFreeFor(simple));
+        assertFalse(agenda.isFreeFor(fixedTermination));
+        assertFalse(agenda.isFreeFor(fixedRepetitions ));
+        assertFalse(agenda.isFreeFor(neverEnding ));
+    }
 }

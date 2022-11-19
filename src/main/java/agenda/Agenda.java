@@ -1,6 +1,8 @@
 package agenda;
 
-import java.time.LocalDate;
+//import sun.util.resources.LocaleData;
+
+import java.time.*;
 import java.util.*;
 
 /**
@@ -12,19 +14,44 @@ public class Agenda {
      *
      * @param e the event to add
      */
+    List<Event> events= new ArrayList<Event>();
     public void addEvent(Event e) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.events.add(e);
     }
 
     /**
      * Computes the events that occur on a given day
      *
      * @param day the day toi test
-     * @return and iteraror to the events that occur on that day
+     * @return and iterator to the events that occur on that day
      */
     public List<Event> eventsInDay(LocalDate day) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        List<Event> Currentev = new ArrayList<Event>();
+        for(Event ev:events){
+            if(ev.getStart().toLocalDate().equals(day)){
+                Currentev.add(ev);
+            }
+        }
+        return Currentev;
     }
+    public List<Event> findByTitle(String title) {
+        List<Event> evn= new ArrayList<Event>();
+        for(Event ev :events){
+            if(ev.getTitle().equals(title)){
+                evn.add(ev);
+            }
+        }
+        return evn;
+    }
+    public boolean isFreeFor(Event e) {
+        for(Event ev: events){
+            if(ev.eventInSameTime(e)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
 }
